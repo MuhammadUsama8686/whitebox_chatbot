@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhiteBox Chatbot</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to right, #e0f7fa, #e1bee7);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 700px;
+            text-align: center;
+        }
+        .logo {
+            max-width: 200px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #333;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        .query-box {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .query-box textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            resize: vertical;
+            min-height: 120px;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+        .query-box button {
+            padding: 12px;
+            border: none;
+            background: #007BFF;
+            color: white;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .query-box button:hover {
+            background: #0056b3;
+        }
+        .response-box {
+            margin-top: 30px;
+        }
+        .response-box h2 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .response-box p {
+            background: #f4f7f6;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: left;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="WhiteBox Logo" class="logo">
+        <h1>WhiteBox Chatbot</h1>
+        <div class="query-box">
+            <textarea id="query" placeholder="Enter your query here..."></textarea>
+            <button onclick="sendQuery()">Send</button>
+        </div>
+        <div class="response-box" id="responseBox" style="display: none;">
+            <h2>Response:</h2>
+            <p id="response"></p>
+        </div>
+    </div>
+
+    <script>
+        async function sendQuery() {
+            const query = document.getElementById('query').value;
+            if (query.trim() === '') {
+                alert('Please enter a query');
+                return;
+            }
+
+            const responseBox = document.getElementById('responseBox');
+            const responseText = document.getElementById('response');
+
+            responseBox.style.display = 'none';
+            responseText.textContent = '';
+
+            try {
+                const response = await fetch('/query', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        session_id: 'default',
+                        input: query
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    responseBox.style.display = 'block';
+                    responseText.innerHTML = formatResponse(data.response);
+                } else {
+                    responseText.textContent = 'Error: Unable to fetch response';
+                    responseBox.style.display = 'block';
+                }
+            } catch (error) {
+                responseText.textContent = 'Error: ' + error.message;
+                responseBox.style.display = 'block';
+            }
+        }
+
+        function formatResponse(text) {
+            // Convert double asterisks to bold
+            text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+            // Convert numbered points into an ordered list
+            text = text.replace(/(\d+)\.\s/g, '<li>'); 
+            text = text.replace(/1\.<li>/g, '<ol><li>'); 
+            text = text.replace(/(<li>)(?=\d)/g, '</li><li>'); 
+            text = text.replace(/(<li>)(?!.*\d)/g, '</li></ol>'); 
+
+            return text;
+        }
+    </script>
+</body>
+</html>
