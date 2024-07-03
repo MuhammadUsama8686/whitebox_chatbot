@@ -14,6 +14,7 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from dotenv import load_dotenv
 
 from langchain_community.vectorstores import Pinecone
 from langchain_openai import OpenAIEmbeddings
@@ -23,11 +24,13 @@ from langchain.memory import ConversationBufferMemory
 
 from langchain_pinecone import PineconeVectorStore
 
+load_dotenv()
 
 
-os.environ["OPENAI_API_KEY"]="sk-proj-84Q3oi1XvPqx0A9NjHDcT3BlbkFJUhboMVh87u1bVIpfORHf"
-os.environ["GROQ_API_KEY"]= "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"
-os.environ["PINECONE_API_KEY"]="7cc6f435-2701-4c88-bf17-5653487c3e2c"
+# Access the API keys from environment variables
+os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
+os.environ["GROQ_API_KEY"] = os.getenv("GROQ_API_KEY")
+os.environ["PINECONE_API_KEY"] = os.getenv("PINECONE_API_KEY")
 
 
 embeddings = OpenAIEmbeddings(model="text-embedding-3-small")

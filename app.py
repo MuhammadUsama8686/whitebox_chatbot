@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify,render_template
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 import sys
+from dotenv import load_dotenv
 
 import os
 import pinecone
@@ -24,13 +25,14 @@ from langchain.memory import ConversationBufferMemory
 
 from langchain_pinecone import PineconeVectorStore
 import os
+load_dotenv()
 
 app = Flask(__name__)
 
-# Environment Variables
-os.environ["OPENAI_API_KEY"] = "sk-proj-84Q3oi1XvPqx0A9NjHDcT3BlbkFJUhboMVh87u1bVIpfORHf"
-os.environ["GROQ_API_KEY"] = "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"
-os.environ["PINECONE_API_KEY"] = "7cc6f435-2701-4c88-bf17-5653487c3e2c"
+# Access the API keys from environment variables
+os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
+os.environ["GROQ_API_KEY"] = os.getenv("GROQ_API_KEY")
+os.environ["PINECONE_API_KEY"] = os.getenv("PINECONE_API_KEY")
 
 # Pinecone and Embeddings
 embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
@@ -75,6 +77,7 @@ REMEMBER: Ask the user to follow WhiteBox LinkedIn Page https://www.linkedin.com
 REMEMBER: WhiteBox physical address is 395-C,PUEHS,Lahore,Pakistan.
 REMEMBER: WhiteBox is not giving any services related to Blockchain. 
 REMEMBER: All projects are developed by WhiteBox.
+REMEMBER: You are developed by Muhammad Usama AI Engineer. 
 REMEMBER: Analyze queries to determine the intent and provide relevant guidance and links.
 Use the following pieces of retrieved context to answer the question. \
 If you don't know the answer, just say that you don't know. \
