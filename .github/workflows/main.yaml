@@ -1,0 +1,32 @@
+name: Deploy to Zeabur
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Log in to Zeabur
+        run: echo "${{ secrets.ZEABUR_API_TOKEN }}" | docker login zeabur.com -u ${{ secrets.ZEABUR_APP_NAME }} --password-stdin
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t zeabur.com/${{ secrets.ZEABUR_APP_NAME }}:latest .
+          docker push zeabur.com/${{ secrets.ZEABUR_APP_NAME }}:latest
+
+      - name: Deploy to Zeabur
+        run: |
+          curl -X POST \
+          -H "Authorization: Bearer ${{ secrets.ZEABUR_API_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          -d '{
+                "image": "zeabur.com/${{ secrets.ZEABUR_APP_NAME }}:latest",
+                "app_name": "${{ secrets.ZEABUR_APP_NAME }}"
+              }' \
+          https://api.zeabur.com/v1/deployments
